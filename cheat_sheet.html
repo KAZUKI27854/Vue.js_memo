@@ -16,6 +16,12 @@
         <h2>コード記述時の注意事項</h2>
         <li>computedプロパティには（）をつけない。methodsプロパティには（）をつける（イベントメソッドかつ、引数を持たないメソッドの場合のみ（）の省略が可能）。</li>
         <li>プロパティ名をケバブケース（ーで繋ぐ）で書く場合は、''で囲む必要がある。</li>
+        <li>viewへ影響を与えずに複数のタグをグループ化したい場合は、templateタグで囲む<br>
+            =>ただし、key属性を使う場合のみ、templateタグは使えない（DOMへ反映させる必要があるため）<br>
+            =>key属性は、配列の要素を区別するために使う一意のデータ
+        </li>
+        <li>v-forを使う際は、予期せぬ挙動を防ぐため必ずkey属性をつける</li>
+        <li>v-for構文のinは、ofにしても同じ挙動をする</li>
     </div>
 
 
@@ -97,11 +103,51 @@
         <h2 :class="classObject">Hello</h2>
         <button @click="isActive = !isActive">文字色切り替え</button>
 
+        <!-- 条件付きレンダリング -->
+        <h2 v-if="isActive">Active!</h2>
+        <!-- v-elseや、v-else-ifはv-ifの直後に記述しないと動作しないので注意！！ -->
+        <h2 v-else>NotActive...</h2>
+
+
+
+
+        <!-- 重要！！！！！！！！！！ -->
+        <!-- v-showでもv-ifと同じような挙動になるが、v-ifとv-showではそれぞれデメリットがあるので使い分けが必要！
+        【それぞれのデメリット】
+        v-show: 非表示になった際に、DOM上には存在し、display: none;で非表示にしている為、非表示でも毎回読み込まれる。その為描画コストが高い。templateタグにも利用できない。
+        v-if: 非表示になった際にはDOMから削除される。その為、頻繁に切り替えが行われると描画コストが高くなる。
+        -> 結論：　基本はv-ifを使い、頻繁に切り替えが行われるときはv-showを使う -->
+        <h2 v-show="isActive">v-show is Active!(非表示になっていても、DOMにはあるため検証ツールで確認可能）</h2>
+
+
+
+
+
         <!-- cssのバインディング(オブジェクト形式でプロパティを記載して、オブジェクトごとバインディングさせることも可能で、そちらが推奨) -->
         <h2 :style="{color: textColor, 'background-color': bgColor}">CSS Binding</h2>
 
         <!-- 複数のオブジェクトをバインディングさせるには配列で記載
         <h2 :style="[ObjectA, ObjectB]">Hello</h2> -->
+
+        <!-- 配列から繰り返しデータを取得する(fruitのみも可能、下記のように第二引数を取ることもできる) -->
+        <h3>v-forまとめ</h3>
+        <ul>
+            <li v-for="(fruit, index) in fruits" :key="fruit">{{ index }}{{ fruit }}</li>
+            <!-- オブジェクトから繰り返しデータを取得することも可能で、第二引数にkeyを、第三引数にindexを取ることができる -->
+            <li v-for="(value, key, index) in userObject" :key="value">{{ index }}{{ key }}-{{ value }}</li>
+            <!-- 整数値を順番に取得することも可能 -->
+            <li v-for="n in 5" :key="n">{{ n }}</li>
+        </ul>
+
+
+        <!-- v-forを使う際は、予期せぬ挙動を防ぐため必ずkey属性をつける -->
+        <div v-for="fruit in fruits" :key="fruit">
+            <p>{{ fruit }}</p>
+            <input type="text">
+        </div>
+        <button @click="remove">先頭を削除</button>
+        
+
         
       </div>
       <script>
@@ -124,7 +170,13 @@
                 event: 'click',
                 isActive: true,
                 textColor: 'white',
-                bgColor: 'black'
+                bgColor: 'black',
+                fruits: ['りんご', 'バナナ', 'ぶどう'],
+                userObject: {
+                    firstName: '一郎',
+                    lastName: '鈴木',
+                    age: 25
+                }
             },
             // computedプロパティでは必ず戻り値が必要
             computed: {
@@ -175,6 +227,10 @@
 
                 countUp: function() {
                     this.number += 1;
+                },
+
+                remove: function() {
+                    this.fruits.shift()
                 }
             }
           })
