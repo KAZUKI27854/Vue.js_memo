@@ -9,3 +9,15 @@
 .chips {
     margin-bottom: 2%;
 }
+
+.instance_memo > li {
+    margin-bottom: 2%;
+}
+
+.instance_memo > li:nth-child(2n) {
+    background-color: lightcyan;
+}
+
+.instance_img {
+    width: 100%;
+}

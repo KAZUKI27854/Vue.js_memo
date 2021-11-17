@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Vue.js勉強用メモ（インスタンスまとめ）</title>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+
+    <h1>Vue.js勉強用メモ（インスタンスまとめ）</h1>
+    <div class="instance_memo">
+        <li>外部からVueインスタンスのプロパティを変更する場合は、宣言時に変数として宣言する。</li>
+        <li>
+            外部でVueインスタンスにないプロパティを追加しても表示することはできるが、プロパティの値を動的に変更できなくなる（リアクティブにならない）。<br>
+            => Vueの仕組みとして、Vueインスタンス内のデータを先に参照し、getterやsetterを定義した上で処理を行う為、外側で追加されたプロパティに関してはgetterやsetterが定義されず、リアクティブにならない。
+        </li>
+        <li>外部で定義した変数をVueインスタンス内で呼び出すことはできる。その場合はリアクティブになる。</li>
+        <li>ユーザー定義のプロパティ以外にも、Vueインスタンスがデフォルトで持つプロパティやメソッドはたくさんあり、区別するためにプレフィックスで$が付いていて、公式サイトで確認できる。</li>
+        <li>
+            レンダリング関数のcreateElementでは、DOMを作っているわけではなく、Vueが仮想DOMを作るための情報（仮想DOMのための仮想ノード）を返しているだけ。<br>
+            templateプロパティでも、他のプロパティでも最終的にはレンダリング関数の処理を経て情報を渡し、VueがDOMを作っている。
+        </li>
+        <li>
+            仮想DOMとは？ => DOMの形を模したJavascriptのオブジェクト<br>
+            Vueが仮想DOMを作るのはなぜ？ => DOMを直接変更すると時間がかかり、パフォーマンスが落ちるため！仮想DOMを使って、変更前との差分を確認することで効率よく処理ができるようになる。<br>
+            <br>
+            複数のDOMがあるページで、ボタンをクリックすると一部のDOMが切り替わるケースで考えてみる。<br>
+            DOMを直接操作する： 変更がないDOMにもアクセスする必要があり、効率が悪い。<br>
+            仮想DOMがある： 最初のページのDOMを保持しておき、ボタンがクリックされた後に、レンダリング関数で変更後のページの仮想DOMをVueへ渡す。<br>
+                          変更前のページとの仮想DOMの差分を確認し、変更箇所のDOMを特定してそのDOMだけにアクセスするため効率的！
+        </li>
+        <li>componentは定義した場所より下のインスタンスで利用可能になるため、定義する場所に注意！定義すると、タグとして呼び出すだけで中の処理が行われる。</li>
+    </div>
+
+    <div id="app">
+        <h2>
+            <a :href="siteUrl">VueのAPI一覧（左のバーからインスタンスメソッドやプロパティが確認できる）</a>
+        </h2>
+        <p>{{ message }}</p>
+        <!-- componentを利用している箇所 -->
+        <hello></hello>
+        <hello></hello>
+    </div>
+
+    <div id="app2">
+        <p>{{ message }}</p>
+        <button @click="changeMessage">インスタンス1のメッセージを変更</button>
+    </div>
+
+    <div id="renderSample"></div>
+
+    <img src="images/instance_lifecycle.png" alt="instance_lifecycle" class="instance_img">
+    
+    <script>
+        // componentは定義した場所より下のインスタンスで利用可能になるため、定義する場所に注意！
+        Vue.component('hello', {
+            template: '<p>こんにちは</p>'
+        });
+
+        // vmという言葉は、vmパターンというアーキテクチャからきている慣習（RailsでいうMVC的なもの）
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                message: 'インスタンス1',
+                siteUrl: 'https://jp.vuejs.org/v2/api/'
+            }
+        })
+
+        // 表示はできるがリアクティブにならない
+        vm.name = '鈴木一郎'
+
+        // この変数をVueインスタンス内でdata: dataのような形で呼び出すとリアクティブになる
+        var data = {
+            message: 'test',
+            name: 'user'
+        }
+
+        var vm2 = new Vue({
+            el: '#app2',
+            data: {
+                message: 'インスタンス2'
+            },
+            methods: {
+                changeMessage: function() {
+                    vm.message = 'メッセージを外部から変更しました'
+                }
+            }
+        })
+
+        // 以下のような形でvueインスタンスを適用させる範囲を後から動的に変更可能
+        // vm.$mount(#app2)
+
+
+        // viewに記載せずに、レンダリング関数で描画することも可能
+        new Vue({
+            data: {
+                func: 'レンダリング関数'
+            },
+            // createElementは慣習で、hとだけ記載されることもある
+            render: function(createElement) {
+                return createElement('h2', this.func + 'で描画しています')
+            }
+        // インスタンスメソッドで後からマウント(インスタンスを適用させる箇所を決めること）も可能
+        }).$mount('#renderSample')
+
+    </script>
+
+</body>
+</html>
