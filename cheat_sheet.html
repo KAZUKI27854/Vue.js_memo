@@ -4,13 +4,20 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    <title>Vue.js勉強用メモ</title>
 </head>
 <body>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
 
     <h1>Vue.js勉強用メモ（メソッド、プロパティ、ディレクティブまとめ）</h1>
-    <p>computedプロパティには（）をつけない。methodsプロパティには（）をつける（イベントメソッドかつ、引数を持たないメソッドの場合のみ（）の省略が可能）。</p>
+
+    <div class="chips">
+        <h2>コード記述時の注意事項</h2>
+        <li>computedプロパティには（）をつけない。methodsプロパティには（）をつける（イベントメソッドかつ、引数を持たないメソッドの場合のみ（）の省略が可能）。</li>
+        <li>プロパティ名をケバブケース（ーで繋ぐ）で書く場合は、''で囲む必要がある。</li>
+    </div>
+
 
     <div id="app">
         <!-- DOMイベントのクリックをトリガーとしてreverseMessageメソッドを呼び出し。引数がない場合は()を付けても付けなくても同じ -->
@@ -84,6 +91,17 @@
 
         <!-- spaceやenterはキー修飾子と呼び、特定のキーを押した時にだけ発火するようにできる（繋げたり、単独どちらも使用可能） -->
         <input type="text" v-on:keyup.space.enter="myAlert">
+
+        <!-- クラスをデータへバインディングさせる -->
+        <!-- :class="[red, blue]"のような形で配列にすることも可能 -->
+        <h2 :class="classObject">Hello</h2>
+        <button @click="isActive = !isActive">文字色切り替え</button>
+
+        <!-- cssのバインディング(オブジェクト形式でプロパティを記載して、オブジェクトごとバインディングさせることも可能で、そちらが推奨) -->
+        <h2 :style="{color: textColor, 'background-color': bgColor}">CSS Binding</h2>
+
+        <!-- 複数のオブジェクトをバインディングさせるには配列で記載
+        <h2 :style="[ObjectA, ObjectB]">Hello</h2> -->
         
       </div>
       <script>
@@ -103,12 +121,22 @@
                 x: 0,
                 y: 0,
                 number: 0,
-                event: 'click'
+                event: 'click',
+                isActive: true,
+                textColor: 'white',
+                bgColor: 'black'
             },
             // computedプロパティでは必ず戻り値が必要
             computed: {
                 lessThanThree: function() {
                     return this.number > 3 ? '3より上' : '3以下'
+                },
+
+                classObject: function() {
+                    return {
+                        red: this.isActive,
+                        blue: !this.isActive
+                    }
                 }
             },
             // 基本的にはcomputedを使うが、非同期処理ではreturnを記述することができないので、やりたいことがcomputedで出来ない場合のみwatchプロパティを使う
