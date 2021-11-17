@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+
+    <h1>Vue.js勉強用メモ（メソッド、プロパティ、ディレクティブまとめ）</h1>
+    <p>computedプロパティには（）をつけない。methodsプロパティには（）をつける（イベントメソッドかつ、引数を持たないメソッドの場合のみ（）の省略が可能）。</p>
+
+    <div id="app">
+        <!-- DOMイベントのクリックをトリガーとしてreverseMessageメソッドを呼び出し。引数がない場合は()を付けても付けなくても同じ -->
+        <button v-on:click="reverseMessage">
+            メッセージ反転
+        </button>
+
+        <a :href="domLink">DOMイベント一覧</a>
+
+        <!-- v-modelディレクティブにより双方向バインディングが可能（new Vue()内のmessageプロパティを変えることでview側の表示を切り替えることは可能だったが、v-modelを使うことでviewで指定した内容をプロパティ側へバインディングすることも可能になる） -->
+        <div>
+            <input type="text" v-model="message">
+        </div>
+    
+        <!-- messageプロパティ内のデータを表示 -->
+        <p>{{message}}</p>
+        <p v-text="message"></p>
+
+        <!-- 他のメソッド内でmessage内のデータが書き換えられていても、必ず1度だけ「HelloWorld!」が表示される -->
+        <p v-once>{{message}}(v-once)</p>
+
+        <!-- htmlタグをプレーンなテキストとするか、タグとして適用させるか -->
+        <p>{{ html }}</p>
+        <!-- クロスサイトスクリプティングによる脆弱性がある為、ユーザーから提供されたデータをv-htmlで受け取らないようにする -->
+        <p v-html="html"></p>
+
+        <!-- v-bindは必ず引数を持つ -->
+        <a v-bind:href="url">Google</a>
+        <!-- v-bindは省略可能 -->
+        <a :href="url">Google(v-bind省略)</a>
+
+        <!-- :[]を使用することで属性も動的に変更可能 -->
+        <a :[attribute]="url">Google(属性も省略)</a>
+
+        <!-- v-onディレクティブでも同じように動的な変更が可能 -->
+        <p>クリック回数：{{ number }}</p>
+        <button v-on:[event]="countUp">カウントアップ</button>
+        <!-- v-onディレクティブでの省略形には@をつける -->
+        <button @[event]="countUp">カウントアップ</button>
+        <button @click="countUp">カウントアップ</button>
+
+
+
+        <!-- 重要！！！！！！！！！！ -->
+        <!-- computedプロパティで記述したものは、methodsプロパティでも同じように記述できるが、methodsプロパティで記述してはいけない。違いは以下の通り。
+        computed： 参照するプロパティ（今回の場合はcounter）の値が変わった時のみ発火
+        methods: メソッドには直接関係ないプロパティでも、その値が変化したときに発火してしまう -->
+
+        <!-- computedプロパティを使用する際の書き方 -->
+        <p>{{ lessThanThree }}</p>
+
+
+
+
+        <!-- オブジェクトとしてまとめて色々な属性や数値を定義して、渡すことも可能 -->
+        <a v-bind="twitterObject">Twitter</a>
+
+        <!-- イベントオブジェクトの取得（中身にどのようなデータが入っているかはconsole.log(event)のような形で検証ツールから確認可能） -->
+        <p v-on:mousemove="changeMousePosition">マウスを載せて下さい
+
+            <!-- イベント修飾子によって発火しないようにする（後に=を付けて別のメソッドを書くことも可能） -->
+            <!-- stop = event.stopPropagation()を簡単に表現できるvueの修飾子 -->
+            <span v-on:mousemove.stop>この文字上ではMouseMoveが無効になります</span>
+            <!-- prevent = event.preventDefault()を簡単に表現できるvueの修飾子 -->
+            <a v-on:click.prevent v-bind:href="url">Google（prevent修飾子付き）</a>
+        </p>
+
+        <!-- イベントオブジェクトを持つメソッドへ引数を渡す場合は$eventという特別な引数を渡す必要があるので注意！！！！ -->
+        <p v-on:mousemove="changeMousePosition2(100, $event)">マウスを載せて下さい（XとYを任意の数で割って表示します）</p>
+        <p>X:{{ x }}、Y:{{ y }}</p>
+
+        <!-- spaceやenterはキー修飾子と呼び、特定のキーを押した時にだけ発火するようにできる（繋げたり、単独どちらも使用可能） -->
+        <input type="text" v-on:keyup.space.enter="myAlert">
+        
+      </div>
+      <script>
+          new Vue({
+            // 適用させるエレメントを指定
+            el: '#app',
+            data: {
+                message: 'HelloWorld!',
+                html: '<h1>h1タグ</h1>',
+                url: 'https://google.com',
+                attribute: 'href',
+                twitterObject: {
+                    href: 'https://twitter.com',
+                    id: 'test'
+                },
+                domLink: 'https://developer.mozilla.org/ja/docs/Web/Events',
+                x: 0,
+                y: 0,
+                number: 0,
+                event: 'click'
+            },
+            // computedプロパティでは必ず戻り値が必要
+            computed: {
+                lessThanThree: function() {
+                    return this.number > 3 ? '3より上' : '3以下'
+                }
+            },
+            // 基本的にはcomputedを使うが、非同期処理ではreturnを記述することができないので、やりたいことがcomputedで出来ない場合のみwatchプロパティを使う
+            watch: {
+                number: function() {
+                    var vm = this;
+                    setTimeout(function(){
+                        vm.number = 0;
+                    }, 3000)
+                }
+            },
+            methods: {
+                reverseMessage: function() {
+                // 同じブロック内のプロパティにアクセスする時はthisをつける
+                this.message = this.message.split('').reverse().join('')
+
+                // v-onceメソッドが正しく動作しているかのテスト用
+                this.message = "こんにちは世界"
+                },
+
+                // イベントオブジェクトの取得（変数名はeventとするのが慣例）
+                changeMousePosition: function(event) {
+                    this.x = event.clientX;
+                    this.y = event.clientY;
+                },
+
+                //　イベントオブジェクトを引数に持つメソッドへ、別の引数を渡す
+                changeMousePosition2: function(divideNumber, event) {
+                    this.x = event.clientX / divideNumber;
+                    this.y = event.clientY / divideNumber;
+                },
+
+                myAlert() {
+                    alert('EnterキーかSpaceキーが押されました');
+                },
+
+                countUp: function() {
+                    this.number += 1;
+                }
+            }
+          })
+      </script>
+</body>
+</html>
