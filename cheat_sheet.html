@@ -23,11 +23,18 @@
         <li>v-forを使う際は、予期せぬ挙動を防ぐため必ずkey属性をつける</li>
         <li>v-for構文のinは、ofにしても同じ挙動をする</li>
         <li>
-            省略形まとめ<br>
+            【省略形まとめ】<br>
             : => v-bind <br>
             @ => v-on <br>
             # => v-slot
         </li>
+        <li>
+            【v-modelにつけられる修飾子まとめ】<br>
+            v-model.lazy => デフォルトではフォームで文字入力をするたびに画面に反映されるが、lazyをつけるとフォームからカーソルが外れた時に初めて描画される<br>
+            v-model.number => type="number"のinputタグであっても、数字が入力されると文字列として受け取ってしまう。それを数値型に変換する。<br>
+            v-model.trim => 先頭と末尾の空白を切り取ってくれる。<br>
+        </li>
+        <li>改行で入力された文章を改行表示させたい時は、preタグか、cssのwhite-space: pre;をつける</li>
     </div>
 
 
