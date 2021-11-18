@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Vue.js勉強用メモ（コンポーネントまとめ）</title>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+
+    <h1>Vue.js勉強用メモ（コンポーネントまとめ）</h1>
+
+    <div class="component_memo">
+        <li>なぜコンポーネントが必要？ => 同じ要素を複数並べている場合でも、Vueインスタンスが適用されるのは最初の1つだけなので、繰り返し同じものを表示するために使う。</li>
+        <li>
+            コンポーネントを使うときの注意事項： インスタンスの時とは違い、データは関数の形にしないといけないので、関数としてreturnによる戻り値として返す。<br>
+            なぜ？ => インスタンスの時と同様にデータをオブジェクトで記載すると、一つの値が変更された場合に、残りのコンポーネントも連動して値が変化してしまうため。
+        </li>
+        <li>
+            グローバル登録とローカル登録の違い（あまり使っていないコンポーネントをグローバル登録することでファイルサイズが大きくなるなど弊害がある為、ローカル登録が存在する）<br>
+            グローバル登録: Vue.componentの形で記述し、viewの中でタグを呼び出す。<br>
+            ローカル登録: 変数の形で記述し、Vueインスタンス内で変数とタグを紐付けた後、viewの中でタグを呼び出す。
+        </li>
+    </div>
+
+    <div id="app">
+        <my-component></my-component>
+    </div>
+
+    <div id="local-component">
+        <local></local>
+    </div>
+
+    <script>
+        // グローバル登録
+        Vue.component('my-component', {
+            // インスタンスの時とは違い、関数の形にしないといけないのでデータであっても関数としてreturnによる戻り値として返す
+            data: function(){
+                return {
+                    number: 12
+                }
+            },
+            template: '<p>いいね( {{ number }} )</p>'
+        })
+
+        // ローカル登録1/2
+        var localComponent = {
+            data: function(){
+                return {
+                    phrase: 'ローカル登録のコンポーネント'
+                }
+            },
+            template: '<p>{{ phrase }}</p>'
+        }
+
+        new Vue({
+            el: '#app',
+        })
+
+        new Vue({
+            el: '#local-component',
+            // ローカル登録2/2
+            components: {
+                'local': localComponent
+            }
+        })
+    </script>
+    
+</body>
+</html>

@@ -10,11 +10,13 @@
     margin-bottom: 2%;
 }
 
-.instance_memo > li {
+.instance_memo > li,
+.component_memo > li {
     margin-bottom: 2%;
 }
 
-.instance_memo > li:nth-child(2n) {
+.instance_memo > li:nth-child(2n),
+.component_memo > li:nth-child(2n) {
     background-color: lightcyan;
 }
 
