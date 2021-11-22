@@ -59,7 +59,7 @@
         <li>transitionを再利用するときはcomponentを作成し、slotを使うことでやりやすくなる</li>
         <li>
             【vue-routerを使ったURLによるルーティングまとめ】<br>
-            1. npm install vue-routerでインストールを行う
+            1. npm install vue-routerでインストールを行う<br>
             2. router.jsを作成し、必要な情報を記述する<br>
             3. main.jsでrouter.jsをimportし、Vueインスタンス内にrouterプロパティを記述する<br>
             4. App.vueのtemplateタグ内へrouter-viewタグを書くと、URLに応じてそのタグ内でコンポーネントが動的に切り替わる<br>
@@ -87,8 +87,23 @@
         <li>
             【vue-routerの遅延ローディング】<br>
             ・遅延ローディングとは？： router.jsで大量のコンポーネントをインポートすることになるが、デフォルトでは最初のページを開いた際に<br>
-                                   全てのコンポーネントが読み込みされる為時間がかかる。そこで、ページを開く際にそのページのコンポーネントをその都度インポートできるようにする。<br>
-            ・
+                                   全てのコンポーネントが読み込みされる為時間がかかる。そこで、ページを開く際にそのページのコンポーネントをその都度インポートできるようにする。
+        </li>
+        <li>
+            【vuexで末端コンポーネント同士のデータのやり取りをスムーズにする】<br>
+            1. npm install vuexでインストールを行う<br>
+            2. store.jsを作成し、必要な情報を記述する<br>
+            3. main.jsでstore.jsをimportし、Vueインスタンス内にstoreプロパティを記述する<br>
+            4. どのコンポーネントからでもthis.$store.state.○◯でプロパティを使えるようになる（$storeの部分はmain.jsで定義したプロパティによって異なる）<br>
+            <span style=" color: red;" >
+                注意！！：どのようなコンポーネントでもデータを参照できるということは、データを書き換えられる可能性もあり、
+                非常にバグが生まれやすくなるため、vuexに渡すデータの変更にはmutationsを用いることが推奨されている
+            </span><br>
+        </li>
+        <li>mutationsでは同期的な処理しか書けないので、非同期処理を行う場合はactionsを使う（mapActionsも使用可能）</li>
+        <li>
+            【vuexによるコードの肥大化を防ぐフォルダ構成】<br>
+            src配下にstoreフォルダを作成し、getters.jsやmutations.js、index.jsなどを作成。storeフォルダ配下に更にmodulesフォルダを作成し、機能別のjsファイルを作成する。
         </li>
     </div>
 
